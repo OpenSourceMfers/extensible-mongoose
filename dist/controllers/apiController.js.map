@@ -1,0 +1,1 @@
+{"version":3,"file":"apiController.js","sourceRoot":"","sources":["../../controllers/apiController.ts"],"names":[],"mappings":";;;;;;;;;;;AAEA,MAAqB,aAAa;IAAlC;QAGI,SAAI,GAAa,CAAO,GAAQ,EAAE,GAAQ,EAAE,EAAE;YACzC,OAAO,GAAG,CAAC,MAAM,CAAC,GAAG,CAAC,CAAC,IAAI,CAAC,MAAM,CAAC,CAAA;QACxC,CAAC,CAAA,CAAA;IAEL,CAAC;CAAA;AAPD,gCAOC"}
