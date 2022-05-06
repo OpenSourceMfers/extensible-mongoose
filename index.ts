@@ -7,6 +7,7 @@ export interface Route {
   type:string,
   uri: string,
   method: string,
+  preHooks?: Array<string>
   controller?: string
   appendParams?: any
 }
@@ -52,7 +53,10 @@ export default class DegenRouteLoader {
     let restAction: string = route.type 
     let endpointURI: string = route.uri
     let methodName: string = route.method 
+
+
     let appendParams: any = route.appendParams ? JSON.parse(JSON.stringify( route.appendParams )) : undefined
+    let preHooks: string[]  = route.preHooks ? route.preHooks : []
 
     if (typeof endpointURI != 'string' ) {
       throw 'Error: invalid route format for endpointURI'
@@ -68,24 +72,39 @@ export default class DegenRouteLoader {
 
     restAction = restAction.toLowerCase()
 
-    if (restAction == 'get') {
-      expressApp.get(endpointURI, async (req: any, res: any) => {
-        req = DegenRouteLoader.appendParams(req, appendParams)
 
-
-        let response = await controllerClass[methodName](req)
-
-
-        res.send(response.statusCode)
-      })
+    const formattedRouteData : Route = { 
+      type: restAction,
+      uri: endpointURI,
+      method: methodName,
+      appendParams,
+      preHooks 
     }
 
-    if (restAction == 'post') {
-      expressApp.post(endpointURI, async (req: any, res: any) => {
+    if (restAction == 'get' || restAction == 'post') {
+      expressApp[restAction](endpointURI, async (req: any, res: any) => {
+       
         req = DegenRouteLoader.appendParams(req, appendParams)
-        return await controllerClass[methodName](req, res)
+
+        let {success, outputBody} = await this.performEndpointActions(req, formattedRouteData)
+
+        let statusCode = success? this.config.successCode : this.config.failureCode
+
+        return res.status(statusCode).send(outputBody)
       })
-    }
+    } 
+  }
+
+  async performEndpointActions(  req: any, route: Route ){
+
+    
+
+    let combinedPreHooksResponse = this.runPreHooks(preHooks,req)
+
+    let methodResponse = await controllerClass[methodName](req)
+
+
+    return {} //overall response 
   }
 
   static appendParams(req:any, appendParams: any){
