@@ -9,7 +9,7 @@
 
 
 
-        import DegenRouteLoader from 'mini-route-loader'
+        import DegenRouteLoader from 'degen-route-loader'
 
         import APIController from '../controllers/APIController'
 
