@@ -1,7 +1,10 @@
 
 
 
-export type APICall = (req: any, res: any) => any
+//export type APICall = (req: any, res: any) => any
+
+
+export type ControllerMethod = (req: any) => Promise<AssertionResponse>
 
 export interface Route {
   type:string,

@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 class ApiController {
     constructor() {
-        this.ping = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.status(200).send('Pong');
+        this.ping = (req) => __awaiter(this, void 0, void 0, function* () {
+            return { success: true, data: 'pong' };
         });
     }
 }
