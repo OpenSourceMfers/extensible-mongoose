@@ -1,8 +1,8 @@
-import { expect, should } from 'chai'
+import { config, expect, should } from 'chai'
 import ApiController from '../controllers/apiController'
  
 
-import MiniRouteLoader, { MiniRoute } from '../index'
+import DegenRouteLoader, { Config, Route } from '../index'
 
  
 import express from 'express'
@@ -22,7 +22,11 @@ describe('Route Loader', () => {
 
     let controller = new ApiController()
 
-    MiniRouteLoader.loadRoutes( app, routes, controller)
+ 
+
+    let degenRouteLoader = new DegenRouteLoader( )
+
+    degenRouteLoader.loadRoutes( app, routes, controller)
 
     app.listen(apiPort, () => {
       console.log(`API Server listening at http://localhost:${apiPort}`)

@@ -12,18 +12,18 @@ export interface Route {
   appendParams?: any
 }
 
-
-export interface Config {
-  verboseLogging: boolean,
-  successCode: number,
-  failureCode: number
-}
-
 export interface AssertionResponse{
   success:boolean,
   data?: any,
   error?: string 
 }
+export interface Config {
+  verboseLogging?: boolean,
+  successCode?: number,
+  failureCode?: number
+}
+
+
 
 
 const configDefaults: Config = {
@@ -39,7 +39,7 @@ export default class DegenRouteLoader {
    config:Config
 
 
-   constructor(conf: Config) {
+   constructor(conf?: Config) {
       this.config = { ...configDefaults, ...conf };
   }
  

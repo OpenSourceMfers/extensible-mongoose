@@ -21,7 +21,8 @@ describe('Route Loader', () => {
         const app = (0, express_1.default)();
         const apiPort = 4041;
         let controller = new apiController_1.default();
-        index_1.default.loadRoutes(app, routes, controller);
+        let degenRouteLoader = new index_1.default();
+        degenRouteLoader.loadRoutes(app, routes, controller);
         app.listen(apiPort, () => {
             console.log(`API Server listening at http://localhost:${apiPort}`);
         });

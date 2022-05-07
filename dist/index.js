@@ -9,18 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-class MiniRouteLoader {
-    static loadRoutes(expressApp, routesConfig, controllerClass) {
+const configDefaults = {
+    verboseLogging: false,
+    successCode: 200,
+    failureCode: 401
+};
+class DegenRouteLoader {
+    constructor(conf) {
+        this.config = Object.assign(Object.assign({}, configDefaults), conf);
+    }
+    loadRoutes(expressApp, routesConfig, controllerClass) {
         for (const route of routesConfig) {
-            MiniRouteLoader.configureRoute(expressApp, route, controllerClass);
+            this.configureRoute(expressApp, route, controllerClass);
         }
     }
-    static configureRoute(expressApp, route, controllerClass) {
-        console.log('configuring route', route);
+    configureRoute(expressApp, route, controllerClass) {
+        if (this.config.verboseLogging) {
+            console.log('configuring route', route);
+        }
         let restAction = route.type;
         let endpointURI = route.uri;
         let methodName = route.method;
         let appendParams = route.appendParams ? JSON.parse(JSON.stringify(route.appendParams)) : undefined;
+        let preHooks = route.preHooks ? route.preHooks : [];
         if (typeof endpointURI != 'string') {
             throw 'Error: invalid route format for endpointURI';
         }
@@ -31,18 +42,46 @@ class MiniRouteLoader {
             throw 'Error: invalid route format for restAction';
         }
         restAction = restAction.toLowerCase();
-        if (restAction == 'get') {
-            expressApp.get(endpointURI, (req, res) => __awaiter(this, void 0, void 0, function* () {
-                req = MiniRouteLoader.appendParams(req, appendParams);
-                return yield controllerClass[methodName](req, res);
+        const formattedRouteData = {
+            type: restAction,
+            uri: endpointURI,
+            method: methodName,
+            appendParams,
+            preHooks
+        };
+        if (restAction == 'get' || restAction == 'post') {
+            expressApp[restAction](endpointURI, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                req = DegenRouteLoader.appendParams(req, appendParams);
+                let endpointResult = yield this.performEndpointActions(req, controllerClass, formattedRouteData);
+                let statusCode = endpointResult.success ? this.config.successCode : this.config.failureCode;
+                return res.status(statusCode).send(endpointResult);
             }));
         }
-        if (restAction == 'post') {
-            expressApp.post(endpointURI, (req, res) => __awaiter(this, void 0, void 0, function* () {
-                req = MiniRouteLoader.appendParams(req, appendParams);
-                return yield controllerClass[methodName](req, res);
-            }));
-        }
+    }
+    performEndpointActions(req, controllerClass, route) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let methodName = route.method;
+            let preHooks = route.preHooks;
+            if (preHooks) {
+                let combinedPreHooksResponse = yield this.runPreHooks(controllerClass, preHooks, req);
+                if (!combinedPreHooksResponse.success) {
+                    return { success: false, error: combinedPreHooksResponse.error };
+                }
+            }
+            let methodResponse = yield controllerClass[methodName](req);
+            return methodResponse;
+        });
+    }
+    runPreHooks(controllerClass, preHooks, req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (let preHook of preHooks) {
+                let methodResponse = yield controllerClass[preHook](req);
+                if (!methodResponse.success) {
+                    return methodResponse;
+                }
+            }
+            return { success: true };
+        });
     }
     static appendParams(req, appendParams) {
         if (appendParams) {
@@ -51,5 +90,5 @@ class MiniRouteLoader {
         return Object.assign(req, { router: { params: {} } });
     }
 }
-exports.default = MiniRouteLoader;
+exports.default = DegenRouteLoader;
 //# sourceMappingURL=index.js.map
