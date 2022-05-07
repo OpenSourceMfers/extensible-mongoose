@@ -19,6 +19,12 @@ export interface Config {
   failureCode: number
 }
 
+export interface AssertionResponse{
+  success:boolean,
+  data?: any,
+  error?: string 
+}
+
 
 const configDefaults: Config = {
   verboseLogging:false,
@@ -86,25 +92,46 @@ export default class DegenRouteLoader {
        
         req = DegenRouteLoader.appendParams(req, appendParams)
 
-        let {success, outputBody} = await this.performEndpointActions(req, formattedRouteData)
+        let endpointResult:AssertionResponse = await this.performEndpointActions(req, controllerClass, formattedRouteData)
+ 
+        let statusCode = endpointResult.success? this.config.successCode : this.config.failureCode
 
-        let statusCode = success? this.config.successCode : this.config.failureCode
-
-        return res.status(statusCode).send(outputBody)
+        return res.status(statusCode).send(endpointResult)
       })
     } 
   }
 
-  async performEndpointActions(  req: any, route: Route ){
-
-    
-
-    let combinedPreHooksResponse = this.runPreHooks(preHooks,req)
-
-    let methodResponse = await controllerClass[methodName](req)
+  async performEndpointActions(  req: any, controllerClass: any, route: Route ) : Promise<AssertionResponse>{
+ 
+    let methodName = route.method
+    let preHooks = route.preHooks
 
 
-    return {} //overall response 
+    if(preHooks){
+     let combinedPreHooksResponse:AssertionResponse = await this.runPreHooks(controllerClass,preHooks,req)
+      
+      if(!combinedPreHooksResponse.success){
+        return {success:false, error: combinedPreHooksResponse.error }
+      }
+    }
+
+    let methodResponse:AssertionResponse = await controllerClass[methodName](req)
+
+
+    return methodResponse  
+  }
+
+  async runPreHooks(controllerClass:any, preHooks:string[], req:any  ) : Promise<AssertionResponse>{
+
+    for(let preHook of preHooks){
+      let methodResponse:AssertionResponse = await controllerClass[preHook](req)
+
+      if(!methodResponse.success){
+        return methodResponse
+      }
+    }
+
+    return { success:true } 
   }
 
   static appendParams(req:any, appendParams: any){

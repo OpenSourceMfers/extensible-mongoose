@@ -1,4 +1,4 @@
-#### Mini Route Loader
+#### Degen Route Loader
 
  Route file configuration for express 
 
@@ -48,8 +48,7 @@ controller: The name of the controller that has the methods for this route
 
 appendParams: An object that will be appended to 'req' just before it is passed to the method in the controller.  This will be appended at 'req.router.params'
 
-
-
+preHooks: an array of method names which will be run before the primary method.  If any of these return {success:false, error?: string} then the overall REST api call will fail due to that prehook.  Useful for authentication prehooks and such - which will likely be shared by multiple routes.
 
 ## In routes.json 
 
