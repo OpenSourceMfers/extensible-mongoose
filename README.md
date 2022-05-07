@@ -9,7 +9,7 @@
 
 
 
-        import MiniRouteLoader from 'mini-route-loader'
+        import DegenRouteLoader from 'mini-route-loader'
 
         import APIController from '../controllers/APIController'
 
@@ -18,11 +18,12 @@
         this.apiController=new APIController(  )
                 
 
-
+       
 
         const app = express()
-
-        MiniRouteLoader.loadRoutes( app, Routes , this.apiController  )
+ 
+        const degenRouteLoader = new DegenRouteLoader({})
+        degenRouteLoader.loadRoutes( app, Routes , this.apiController  )
 
         app.listen(apiPort, () => {
         console.log(`API Server listening at http://localhost:${apiPort}`)
@@ -63,12 +64,12 @@ preHooks: an array of method names which will be run before the primary method. 
 
 
 
-        import { APICall } from "mini-route-loader"
+        import { APIMethod } from "degen-route-loader"
 
 
         export default class APIController  {
 
-            ping: APICall =  async (req: any, res: any) => {
+            ping: APIMethod =  async (req: any) => {
                 return res.status(200).send('Pong')
             }
 
