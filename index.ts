@@ -55,7 +55,7 @@ export default class ExtensibleMongooseDatabase
   mongoose = new Mongoose()
 
 
-  registeredModels: Map<string,RegisteredModel>
+  registeredModels: Map<Schema,RegisteredModel>
 
   constructor(){
     this.registeredModels = new Map()
@@ -66,7 +66,7 @@ export default class ExtensibleMongooseDatabase
 
       let model = this.mongoose.model<any>(tableName,schema)
 
-      this.registeredModels.set(tableName,{
+      this.registeredModels.set(schema,{
           tableName,
           schema,
           model
@@ -79,8 +79,8 @@ export default class ExtensibleMongooseDatabase
   /*
     Use this method to retrieve models which have been bounded by the additional components 
   */
-  getModel( tableName:string ){
-      let registeredModelData = this.registeredModels.get(tableName)
+  getModel( schema:Schema ){
+      let registeredModelData = this.registeredModels.get(schema)
 
       if(!registeredModelData || !registeredModelData.model){
           throw new Error(`Tried to retrieve unregistered database model: ${tableName}`)

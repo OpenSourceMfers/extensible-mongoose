@@ -45,7 +45,7 @@ class ExtensibleMongooseDatabase {
     */
     getModel(tableName) {
         let registeredModelData = this.registeredModels.get(tableName);
-        if (!registeredModelData) {
+        if (!registeredModelData || !registeredModelData.model) {
             throw new Error(`Tried to retrieve unregistered database model: ${tableName}`);
         }
         return registeredModelData.model;
