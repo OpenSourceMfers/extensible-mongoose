@@ -1,4 +1,0 @@
-[ 
-    {"type":"get","uri":"/api/ping","preHooks":[], "method":"ping","controller":"api"}
- 
-]

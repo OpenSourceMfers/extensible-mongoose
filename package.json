@@ -11,7 +11,9 @@
   "author": "apexmfer",
   "license": "MIT",
   "dependencies": {
-    "ts-node": "^9.1.1"
+    "ts-node": "^9.1.1",
+    "mongodb": "^3.6.5",
+    "mongoose": "^6.2.9"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",

@@ -1,150 +1,90 @@
 
+import {
+  AnyKeys,
+  connect,
+  FilterQuery,
+  Mongoose,
+  Schema,
+  Model,
+  UpdateQuery,
+} from 'mongoose'
+import { InterfaceType, Type } from 'typescript'
 
 
-//export type APICall = (req: any, res: any) => any
 
-
-export type ControllerMethod = (req: any) => Promise<AssertionResponse>
-
-export interface Route {
-  type:string,
-  uri: string,
-  method: string,
-  preHooks?: Array<string>
-  controller?: string
-  appendParams?: any
-}
-
-export interface AssertionResponse{
-  success:boolean,
-  data?: any,
-  error?: string 
-}
-export interface Config {
-  verboseLogging?: boolean,
-  successCode?: number,
-  failureCode?: number
+export interface RegisteredModel {
+  tableName: string,
+  schema: Schema,
+  model?: Model<any>
 }
 
 
+export default class ExtensibleMongoose
+{   
+
+  mongoose = new Mongoose()
 
 
-const configDefaults: Config = {
-  verboseLogging:false,
-  successCode: 200,
-  failureCode: 401 
-}
+  registeredModels: Map<string,RegisteredModel>
 
-
-export default class DegenRouteLoader {
-
-
-   config:Config
-
-
-   constructor(conf?: Config) {
-      this.config = { ...configDefaults, ...conf };
-  }
- 
-
-  loadRoutes(expressApp: any, routesConfig: Array<Route>, controllerClass: any) {
-    for (const route of routesConfig) {
-      this.configureRoute(expressApp, route, controllerClass)
-    }
+  constructor(){
+    this.registeredModels = new Map()
   }
 
-  configureRoute(expressApp: any, route: Route, controllerClass: any) {
-    
-    if(this.config.verboseLogging){
-      console.log('configuring route', route)
-    }
-    
-    let restAction: string = route.type 
-    let endpointURI: string = route.uri
-    let methodName: string = route.method 
 
+  registerModel( tableName:string, schema:Schema){
 
-    let appendParams: any = route.appendParams ? JSON.parse(JSON.stringify( route.appendParams )) : undefined
-    let preHooks: string[]  = route.preHooks ? route.preHooks : []
+      let model = this.mongoose.model<any>(tableName,schema)
 
-    if (typeof endpointURI != 'string' ) {
-      throw 'Error: invalid route format for endpointURI'
-    }
-
-    if (typeof methodName != 'string') {
-      throw 'Error: invalid route format for methodName'
-    } 
-
-    if (typeof restAction != 'string') {
-      throw 'Error: invalid route format for restAction'
-    }
-
-    restAction = restAction.toLowerCase()
-
-
-    const formattedRouteData : Route = { 
-      type: restAction,
-      uri: endpointURI,
-      method: methodName,
-      appendParams,
-      preHooks 
-    }
-
-    if (restAction == 'get' || restAction == 'post') {
-      expressApp[restAction](endpointURI, async (req: any, res: any) => {
-       
-        req = DegenRouteLoader.appendParams(req, appendParams)
-
-        let endpointResult:AssertionResponse = await this.performEndpointActions(req, controllerClass, formattedRouteData)
- 
-        let statusCode = endpointResult.success? this.config.successCode : this.config.failureCode
-
-        return res.status(statusCode).send(endpointResult)
+      this.registeredModels.set(tableName,{
+          tableName,
+          schema,
+          model
       })
-    } 
+
+      return model
+
   }
 
-  async performEndpointActions(  req: any, controllerClass: any, route: Route ) : Promise<AssertionResponse>{
- 
-    let methodName = route.method
-    let preHooks = route.preHooks
+  /*
+    Use this method to retrieve models which have been bounded by the additional components 
+  */
+  getModel( tableName:string ){
+      let registeredModelData = this.registeredModels.get(tableName)
 
-
-    if(preHooks){
-     let combinedPreHooksResponse:AssertionResponse = await this.runPreHooks(controllerClass,preHooks,req)
-      
-      if(!combinedPreHooksResponse.success){
-        return {success:false, error: combinedPreHooksResponse.error }
+      if(!registeredModelData){
+          throw new Error(`Tried to retrieve unregistered database model: ${tableName}`)
       }
-    }
 
-    let methodResponse:AssertionResponse = await controllerClass[methodName](req)
-
-
-    return methodResponse  
+      return registeredModelData.model
   }
 
-  async runPreHooks(controllerClass:any, preHooks:string[], req:any  ) : Promise<AssertionResponse>{
 
-    for(let preHook of preHooks){
-      let methodResponse:AssertionResponse = await controllerClass[preHook](req)
 
-      if(!methodResponse.success){
-        return methodResponse
+  async init(dbName: string, config?: any) {
+      let host = 'localhost'
+      let port = 27017
+
+      if (config && config.url) {
+      host = config.url
       }
-    }
+      if (config && config.port) {
+      port = config.port
+      }
 
-    return { success:true } 
+      if (dbName == null) {
+      console.log('WARNING: No dbName Specified')
+      process.exit()
+      }
+
+      const url = 'mongodb://' + host + ':' + port + '/' + dbName
+      await this.mongoose.connect(url, {})
+      console.log('connected to ', url, dbName)
   }
 
-  static appendParams(req:any, appendParams: any){
-
-    if(appendParams){
-      return Object.assign( req , {router: { params: appendParams }})
-    }
-
-    return Object.assign( req , {router: { params: {}  }}) 
-
+  async dropDatabase() {
+      await this.mongoose.connection.db.dropDatabase()
   }
+
 
 }

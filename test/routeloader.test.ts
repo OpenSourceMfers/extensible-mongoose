@@ -1,36 +1,18 @@
-import { config, expect, should } from 'chai'
-import ApiController from '../controllers/apiController'
  
-
-import DegenRouteLoader, { Config, Route } from '../index'
-
- 
-import express from 'express'
+import ExtensibleMongoose from '../index'
 
 const routes = require('../config/routes.json')
 
 
-describe('Route Loader', () => {
+describe('Extensible Mongoose', () => {
  
   
   
-  it('can load routes', async () => {
-
-    const app = express()
-
-    const apiPort = 4041
-
-    let controller = new ApiController()
-
+  it('can init', async () => {
  
 
-    let degenRouteLoader = new DegenRouteLoader( )
-
-    degenRouteLoader.loadRoutes( app, routes, controller)
-
-    app.listen(apiPort, () => {
-      console.log(`API Server listening at http://localhost:${apiPort}`)
-    })
+    let mongoDatabase = new ExtensibleMongoose( )
+    await mongoDatabase.init("extensible_mongoose_test") 
 
     
   })

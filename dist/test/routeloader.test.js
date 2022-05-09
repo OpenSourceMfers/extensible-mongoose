@@ -12,20 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const apiController_1 = __importDefault(require("../controllers/apiController"));
 const index_1 = __importDefault(require("../index"));
-const express_1 = __importDefault(require("express"));
 const routes = require('../config/routes.json');
-describe('Route Loader', () => {
-    it('can load routes', () => __awaiter(void 0, void 0, void 0, function* () {
-        const app = (0, express_1.default)();
-        const apiPort = 4041;
-        let controller = new apiController_1.default();
-        let degenRouteLoader = new index_1.default();
-        degenRouteLoader.loadRoutes(app, routes, controller);
-        app.listen(apiPort, () => {
-            console.log(`API Server listening at http://localhost:${apiPort}`);
-        });
+describe('Extensible Mongoose', () => {
+    it('can init', () => __awaiter(void 0, void 0, void 0, function* () {
+        let mongoDatabase = new index_1.default();
+        yield mongoDatabase.init("extensible_mongoose_test");
     }));
 });
 //# sourceMappingURL=routeloader.test.js.map
