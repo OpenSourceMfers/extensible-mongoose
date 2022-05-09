@@ -9,8 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DatabaseExtension = void 0;
 const mongoose_1 = require("mongoose");
-class ExtensibleMongoose {
+class DatabaseExtension {
+    constructor(mongoDatabase) {
+        this.mongoDatabase = mongoDatabase;
+    }
+    //override me 
+    getBindableModels() {
+        return [];
+    }
+    bindModelsToDatabase() {
+        for (let model of this.getBindableModels()) {
+            this.mongoDatabase.registerModel(model.tableName, model.schema);
+        }
+    }
+}
+exports.DatabaseExtension = DatabaseExtension;
+class ExtensibleMongooseDatabase {
     constructor() {
         this.mongoose = new mongoose_1.Mongoose();
         this.registeredModels = new Map();
@@ -59,5 +75,5 @@ class ExtensibleMongoose {
         });
     }
 }
-exports.default = ExtensibleMongoose;
+exports.default = ExtensibleMongooseDatabase;
 //# sourceMappingURL=index.js.map

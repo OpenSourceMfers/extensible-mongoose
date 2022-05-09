@@ -1,6 +1,6 @@
 {
   "name": "extensible-mongoose",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "An extensible wrapper around mongoose that allows for controllers to add tables to the db",
   "main": "dist/index.js",
   "scripts": {

@@ -8,6 +8,7 @@ import {
   Model,
   UpdateQuery,
 } from 'mongoose'
+import { register } from 'ts-node'
 import { InterfaceType, Type } from 'typescript'
 
 
@@ -81,7 +82,7 @@ export default class ExtensibleMongooseDatabase
   getModel( tableName:string ){
       let registeredModelData = this.registeredModels.get(tableName)
 
-      if(!registeredModelData){
+      if(!registeredModelData || !registeredModelData.model){
           throw new Error(`Tried to retrieve unregistered database model: ${tableName}`)
       }
 
