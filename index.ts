@@ -18,8 +18,37 @@ export interface RegisteredModel {
   model?: Model<any>
 }
 
+ 
+  
+export class DatabaseExtension {
 
-export default class ExtensibleMongoose
+
+
+    constructor(public mongoDatabase:ExtensibleMongooseDatabase){
+ 
+    }
+
+
+    //override me 
+    getBindableModels() : Array<RegisteredModel>{
+
+        return []
+    }
+
+    bindModelsToDatabase( ){
+
+        for(let model of this.getBindableModels()){
+            this.mongoDatabase.registerModel( model.tableName, model.schema )
+        }
+
+       
+    }
+
+}
+
+
+
+export default class ExtensibleMongooseDatabase
 {   
 
   mongoose = new Mongoose()
