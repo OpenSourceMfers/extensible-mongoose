@@ -20,8 +20,8 @@ class DatabaseExtension {
         return [];
     }
     bindModelsToDatabase() {
-        for (let model of this.getBindableModels()) {
-            this.mongoDatabase.registerModel(model.tableName, model.schema);
+        for (let def of this.getBindableModels()) {
+            this.mongoDatabase.registerModel(def);
         }
     }
 }
@@ -31,11 +31,11 @@ class ExtensibleMongooseDatabase {
         this.mongoose = new mongoose_1.Mongoose();
         this.registeredModels = new Map();
     }
-    registerModel(tableName, schema) {
-        let model = this.mongoose.model(tableName, schema);
-        this.registeredModels.set(tableName, {
-            tableName,
-            schema,
+    registerModel(def) {
+        let model = this.mongoose.model(def.tableName, def.schema);
+        this.registeredModels.set(def.tableName, {
+            tableName: def.tableName,
+            schema: def.schema,
             model
         });
         return model;
@@ -43,10 +43,10 @@ class ExtensibleMongooseDatabase {
     /*
       Use this method to retrieve models which have been bounded by the additional components
     */
-    getModel(tableName) {
-        let registeredModelData = this.registeredModels.get(tableName);
+    getModel(def) {
+        let registeredModelData = this.registeredModels.get(def.tableName);
         if (!registeredModelData || !registeredModelData.model) {
-            throw new Error(`Tried to retrieve unregistered database model: ${tableName}`);
+            throw new Error(`Tried to retrieve unregistered database model: ${schema}`);
         }
         return registeredModelData.model;
     }

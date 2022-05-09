@@ -12,11 +12,15 @@ import { register } from 'ts-node'
 import { InterfaceType, Type } from 'typescript'
 
 
-
-export interface RegisteredModel {
+export interface TableDefinition {
   tableName: string,
-  schema: Schema,
-  model?: Model<any>
+  schema: Schema 
+}
+
+
+export interface RegisteredModel extends TableDefinition{
+ 
+  model: Model<any>
 }
 
  
@@ -31,15 +35,15 @@ export class DatabaseExtension {
 
 
     //override me 
-    getBindableModels() : Array<RegisteredModel>{
+    getBindableModels() : Array<TableDefinition>{
 
         return []
     }
 
     bindModelsToDatabase( ){
 
-        for(let model of this.getBindableModels()){
-            this.mongoDatabase.registerModel( model.tableName, model.schema )
+        for(let def of this.getBindableModels()){
+            this.mongoDatabase.registerModel(  def  )
         }
 
        
@@ -55,20 +59,20 @@ export default class ExtensibleMongooseDatabase
   mongoose = new Mongoose()
 
 
-  registeredModels: Map<Schema,RegisteredModel>
+  registeredModels: Map<String,RegisteredModel>
 
   constructor(){
     this.registeredModels = new Map()
   }
 
 
-  registerModel( tableName:string, schema:Schema){
+  registerModel( def: TableDefinition ){
 
-      let model = this.mongoose.model<any>(tableName,schema)
+      let model = this.mongoose.model<any>(def.tableName,def.schema)
 
-      this.registeredModels.set(schema,{
-          tableName,
-          schema,
+      this.registeredModels.set(def.tableName,{
+          tableName: def.tableName,
+          schema: def.schema,
           model
       })
 
@@ -79,11 +83,11 @@ export default class ExtensibleMongooseDatabase
   /*
     Use this method to retrieve models which have been bounded by the additional components 
   */
-  getModel( schema:Schema ){
-      let registeredModelData = this.registeredModels.get(schema)
-
+  getModel( def:TableDefinition ){
+      let registeredModelData = this.registeredModels.get(def.tableName)
+     
       if(!registeredModelData || !registeredModelData.model){
-          throw new Error(`Tried to retrieve unregistered database model: ${tableName}`)
+          throw new Error(`Tried to retrieve unregistered database model: ${def.tableName}`)
       }
 
       return registeredModelData.model
