@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const __1 = __importDefault(require(".."));
+const index_1 = __importDefault(require("../index"));
 class StubbedModel extends mongoose_1.Model {
     constructor(tableName, schema) {
         super();
@@ -57,7 +57,7 @@ class StubbedModel extends mongoose_1.Model {
         });
     }
 }
-class MongoDatabaseStub extends __1.default {
+class MongoDatabaseStub extends index_1.default {
     constructor() {
         super(...arguments);
         this.stubbedModels = new Map();

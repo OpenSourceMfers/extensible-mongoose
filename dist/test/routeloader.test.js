@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = __importDefault(require("../index"));
-const routes = require('../config/routes.json');
 describe('Extensible Mongoose', () => {
     it('can init', () => __awaiter(void 0, void 0, void 0, function* () {
         let mongoDatabase = new index_1.default();
