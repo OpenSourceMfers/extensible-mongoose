@@ -23,6 +23,7 @@ export interface RegisteredModel extends TableDefinition{
   model: Model<any>
 }
 
+export * from './test/mongo-database-stub'
  
   
 export class DatabaseExtension {
@@ -84,6 +85,7 @@ export default class ExtensibleMongooseDatabase
     Use this method to retrieve models which have been bounded by the additional components 
   */
   getModel( def:TableDefinition ){
+    
       let registeredModelData = this.registeredModels.get(def.tableName)
      
       if(!registeredModelData || !registeredModelData.model){
@@ -118,6 +120,11 @@ export default class ExtensibleMongooseDatabase
 
   async dropDatabase() {
       await this.mongoose.connection.db.dropDatabase()
+  }
+
+  async disconnect(){
+    await this.mongoose.disconnect()
+
   }
 
 

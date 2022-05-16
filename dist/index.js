@@ -1,4 +1,18 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +25,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DatabaseExtension = void 0;
 const mongoose_1 = require("mongoose");
+__exportStar(require("./test/mongo-database-stub"), exports);
 class DatabaseExtension {
     constructor(mongoDatabase) {
         this.mongoDatabase = mongoDatabase;
@@ -46,7 +61,7 @@ class ExtensibleMongooseDatabase {
     getModel(def) {
         let registeredModelData = this.registeredModels.get(def.tableName);
         if (!registeredModelData || !registeredModelData.model) {
-            throw new Error(`Tried to retrieve unregistered database model: ${schema}`);
+            throw new Error(`Tried to retrieve unregistered database model: ${def.tableName}`);
         }
         return registeredModelData.model;
     }
@@ -72,6 +87,11 @@ class ExtensibleMongooseDatabase {
     dropDatabase() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.mongoose.connection.db.dropDatabase();
+        });
+    }
+    disconnect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.mongoose.disconnect();
         });
     }
 }
