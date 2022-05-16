@@ -8,10 +8,7 @@ import {
   Model,
   UpdateQuery,
 } from 'mongoose'
-import { register } from 'ts-node'
-import { InterfaceType, Type } from 'typescript'
-
-
+ 
 export interface TableDefinition {
   tableName: string,
   schema: Schema 
@@ -21,10 +18,7 @@ export interface TableDefinition {
 export interface RegisteredModel extends TableDefinition{
  
   model: Model<any>
-}
-
-export * from './test/mongo-database-stub'
- 
+} 
   
 export class DatabaseExtension {
 
