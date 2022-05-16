@@ -1,9 +1,7 @@
  
 import ExtensibleMongoose from '../index'
 
-const routes = require('../config/routes.json')
-
-
+ 
 describe('Extensible Mongoose', () => {
  
   

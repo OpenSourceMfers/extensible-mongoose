@@ -1,6 +1,6 @@
  
 import { AnyKeys, FilterQuery, Model, Schema, UpdateQuery } from 'mongoose'
-import ExtensibleMongooseDatabase, { TableDefinition } from '..'
+import ExtensibleMongooseDatabase, { TableDefinition } from '../index'
 
 class StubbedModel extends Model<any>{
   dataStore: any[]

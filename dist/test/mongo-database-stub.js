@@ -69,10 +69,11 @@ class MongoDatabaseStub extends __1.default {
         if (this.stubbedModels.has(tableName)) {
             model = this.stubbedModels.get(tableName);
         }
-        if (!model) {
+        else {
             model = new StubbedModel(tableName, def.schema);
             this.stubbedModels.set(tableName, model);
         }
+        // @ts-ignore
         return model;
     }
 }
