@@ -8,6 +8,10 @@
     "build": "tsc",
     "prepare": "husky install"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenSourceMfers/extensible-mongoose"
+  },
   "author": "apexmfer",
   "license": "MIT",
   "dependencies": {
